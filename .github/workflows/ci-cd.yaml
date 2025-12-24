@@ -88,15 +88,15 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}
 
       # Update deployment.yaml (GitOps)
-      - name: Update image in deployment.yaml
+      - name: Update image in deployment.yml
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}|" Kubernetes/deployment.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}|" Kubernetes/deployment.yml
 
       - name: Commit and push deployment manifest
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add Kubernetes/deployment.yaml
+          git add Kubernetes/deployment.yml
           git commit -m "Update image to ${IMAGE_TAG}" || echo "No changes"
           git push
 
