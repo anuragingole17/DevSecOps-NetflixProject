@@ -11,11 +11,11 @@ jobs:
     name: Unit-Testing
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout-code
+      - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup-node
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
@@ -24,7 +24,7 @@ jobs:
       - run: npm test || echo "Tests failed but pipeline continues"
 
   sonar-test:
-    name: Sonar-scanning
+    name: Sonar Scanning
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -70,8 +70,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Add commit-tag
-        run: echo "IMAGE_TAG={GITHUB_SHA::7}" >> $GITHUB_ENV
+      - name: Set Image Tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Docker Login
         uses: docker/login-action@v3
@@ -81,32 +81,33 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}.
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG} .
 
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}
 
-          # ✅ Update deployment.yaml (GitOps)
+      # Update deployment.yaml (GitOps)
       - name: Update image in deployment.yaml
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}|" Kubernetes/deployment.yaml
 
-      # ✅ Commit & push updated manifest
       - name: Commit and push deployment manifest
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add Kubernetes/deployment.yaml
-          git commit -m "Update image to ${IMAGE_TAG}"
+          git commit -m "Update image to ${IMAGE_TAG}" || echo "No changes"
           git push
-
 
   trivy-image-scan:
     name: Trivy Image Scan
     runs-on: ubuntu-latest
     needs: docker-build-push
     steps:
+      - name: Set Image Tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Trivy Image Scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -114,5 +115,3 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 1
           format: table
-
-  
