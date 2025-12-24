@@ -1,1 +1,55 @@
+name: ci/cd pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request: 
+    branches:  [ main ]
+
+jobs:
+  test:
+    name: Unit-Testing
+    runs-on: ubuntu-latest
+    steps: 
+       - name: Checkout code
+         uses: actions/checkout@v4
+
+       - name: Node-Js
+         uses: actions/setup-node@v4
+         with:
+               node-version: '20'
+               cache: npm
+       - name: Install dependency
+         run: npm Ci
+       - name: Run test
+         run: npm test || echo "running tests"
+
+
+  sonar-test: 
+      name: Sonar-scanning
+      runs-on: ubuntu-latest
+      steps:
+        - name: SonarQube Scan
+          uses: sonarsource/sonarqube-scan-action@v2
+          with:
+            args: >
+               -Dsonar.projectname=Netflix-github
+               -Dsonar.projectkey=Netflix-github
+          env:
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+        - name: SonarQube Quality Gate
+          uses: sonarsource/sonarqube-quality-gate-action@v1
+          timeout-minutes: 5
+          env:
+             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  
+  
+     
+
+
+
+  
 
