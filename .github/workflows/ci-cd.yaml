@@ -101,6 +101,7 @@ jobs:
           git commit -m "Update image to ${IMAGE_TAG}"
           git push
 
+
   trivy-image-scan:
     name: Trivy Image Scan
     runs-on: ubuntu-latest
