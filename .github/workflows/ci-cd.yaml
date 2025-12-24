@@ -1,55 +1,52 @@
-name: ci/cd pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ main ]
-
-  pull_request: 
-    branches:  [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
     name: Unit-Testing
     runs-on: ubuntu-latest
-    steps: 
-       - name: Checkout code
-         uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-       - name: Node-Js
-         uses: actions/setup-node@v4
-         with:
-               node-version: '20'
-               cache: npm
-       - name: Install dependency
-         run: npm Ci
-       - name: Run test
-         run: npm test || echo "running tests"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
 
+      - name: Install dependencies
+        run: npm ci
 
-  sonar-test: 
-      name: Sonar-scanning
-      runs-on: ubuntu-latest
-      steps:
-        - name: SonarQube Scan
-          uses: sonarsource/sonarqube-scan-action@v2
-          with:
-            args: >
-               -Dsonar.projectname=Netflix-github
-               -Dsonar.projectkey=Netflix-github
-          env:
-           SONAR_TOKEN: ${{ secrets.Sonar_Token }}
-           SONAR_HOST_URL: ${{ secrets.Sonar_URL }}
+      - name: Run tests
+        run: npm test || echo "Tests failed but pipeline continues"
 
-        - name: SonarQube Quality Gate
-          uses: sonarsource/sonarqube-quality-gate-action@v1
-          timeout-minutes: 5
-          env:
-             SONAR_TOKEN: ${{ secrets.Sonar_Token }}
-  
-  
-     
+  sonar-test:
+    name: Sonar-scanning
+    runs-on: ubuntu-latest
+    needs: test   # 👈 run after unit tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=netflix-github
+            -Dsonar.projectName=Netflix GitHub
+            -Dsonar.sources=.
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-
-  
-
+      - name: SonarQube Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
