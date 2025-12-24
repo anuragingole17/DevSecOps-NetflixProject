@@ -37,14 +37,14 @@ jobs:
                -Dsonar.projectname=Netflix-github
                -Dsonar.projectkey=Netflix-github
           env:
-           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+           SONAR_TOKEN: ${{ secrets.Sonar_Token }}
+           SONAR_HOST_URL: ${{ secrets.Sonar_URL }}
 
         - name: SonarQube Quality Gate
           uses: sonarsource/sonarqube-quality-gate-action@v1
           timeout-minutes: 5
           env:
-             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+             SONAR_TOKEN: ${{ secrets.Sonar_Token }}
   
   
      
