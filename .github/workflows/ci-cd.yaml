@@ -39,7 +39,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=netflix-github
-            -Dsonar.projectName=Netflix GitHub
+            -Dsonar.projectName=Netflix-gitHub
             -Dsonar.sources=.
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
