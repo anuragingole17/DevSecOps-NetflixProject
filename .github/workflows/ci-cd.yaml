@@ -103,7 +103,7 @@ jobs:
       # Update deployment.yaml (GitOps)
       - name: Update image in deployment.yml
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}|" Kubernetes/deployment.yml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/netflix:${IMAGE_TAG}|" Kubernetes/Netflix-app/deployment.yml
 
       - name: Commit and push deployment manifest
         run: |
