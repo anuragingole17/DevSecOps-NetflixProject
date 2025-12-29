@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: netflix-app
-        image: anuragingole17/netflix:fcea5b0
+        image: anuragingole17/netflix:b892413
         ports:
         - containerPort: 80
